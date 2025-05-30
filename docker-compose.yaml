@@ -134,7 +134,7 @@ services:
     sysctls:
       net.core.somaxconn: 511
     volumes:
-      - ./configs/prometheus.yaml:/etc/prometheus/prometheus.yaml
+      - ./configs/prom.yaml:/etc/prometheus/prometheus.yaml
     networks:
       - kong-obs
   loki:
