@@ -107,22 +107,22 @@ services:
     volumes:
       - ./configs/fluent-bit.yaml:/fluent-bit/etc/fluent-bit.yaml
 
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.101.0
-    container_name: otel-collector
-    networks:
-      - kong-obs
-    volumes:
-      - ./configs/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
-  jaeger:
-    image: jaegertracing/all-in-one:1.57
-    container_name: jaeger
-    ports:
-      - "16686:16686"
-    environment:
-      - COLLECTOR_OTLP_ENABLED=true
-    networks:
-      - kong-obs
+  # otel-collector:
+  #   image: otel/opentelemetry-collector-contrib:0.101.0
+  #   container_name: otel-collector
+  #   networks:
+  #     - kong-obs
+  #   volumes:
+  #     - ./configs/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+  # jaeger:
+  #   image: jaegertracing/all-in-one:1.57
+  #   container_name: jaeger
+  #   ports:
+  #     - "16686:16686"
+  #   environment:
+  #     - COLLECTOR_OTLP_ENABLED=true
+  #   networks:
+  #     - kong-obs
   prometheus:
     image: prom/prometheus:v2.52.0
     container_name: prometheus
