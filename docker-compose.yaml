@@ -81,7 +81,7 @@ services:
   #   image: kong:3.8.0
   #   container_name: kong
   #   volumes:
-  #     - ./configs/kong.yaml:/config/kong.yaml
+  #     - ./config/kong.yaml:/config/kong.yaml
   #   environment:
   #     - KONG_DATABASE=off
   #     - KONG_DECLARATIVE_CONFIG=/config/kong.yaml
@@ -105,7 +105,7 @@ services:
     networks:
       - kong-obs
     volumes:
-      - ./configs/fluent-bit.yaml:/fluent-bit/etc/fluent-bit.yaml
+      - ./config/fluent-bit.yaml:/fluent-bit/etc/fluent-bit.yaml
 
   # otel-collector:
   #   image: otel/opentelemetry-collector-contrib:0.101.0
@@ -113,7 +113,7 @@ services:
   #   networks:
   #     - kong-obs
   #   volumes:
-  #     - ./configs/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+  #     - ./config/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
   # jaeger:
   #   image: jaegertracing/all-in-one:1.57
   #   container_name: jaeger
@@ -134,15 +134,16 @@ services:
     sysctls:
       net.core.somaxconn: 511
     volumes:
-      - ./configs/prom.yaml:/etc/prometheus/prometheus.yaml
+      - ./config/prom.yaml:/etc/prometheus/prometheus.yaml
     networks:
       - kong-obs
+
   loki:
     image: grafana/loki:3.0.0
     container_name: loki
     command: ["-config.file=/mnt/config/loki-config.yaml"]
     volumes:
-      - ./configs/loki-config.yaml:/mnt/config/loki-config.yaml
+      - ./config/loki-config.yaml:/mnt/config/loki-config.yaml
     networks:
       - kong-obs
   grafana:
@@ -154,8 +155,8 @@ services:
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_AUTH_DISABLE_LOGIN_FORM=true
     volumes:
-      - ./configs/grafana/datasources:/etc/grafana/provisioning/datasources/
-      - ./configs/grafana/dashboards:/etc/grafana/provisioning/dashboards/
+      - ./config/grafana/datasources:/etc/grafana/provisioning/datasources/
+      - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards/
     ports:
       - "3000:3000"
     networks:
