@@ -1,0 +1,1065 @@
+_format_version: "3.0"
+consumers:
+- acls:
+  - group: basic_subscription
+    tags:
+    - koodo_service_consumer_dev
+  keyauth_credentials:
+  - key: IgWNJGrAlSDLyZL5RB6ka1xoOUMDerRH
+    tags:
+    - koodo_service_consumer_dev
+  plugins:
+  - config:
+      day: 5
+      error_code: 429
+      error_message: API rate limit exceeded
+      fault_tolerant: true
+      header_name: null
+      hide_client_headers: false
+      hour: null
+      limit_by: consumer
+      minute: null
+      month: null
+      path: null
+      policy: local
+      redis:
+        database: 0
+        host: null
+        password: null
+        port: 6379
+        server_name: null
+        ssl: false
+        ssl_verify: false
+        timeout: 2000
+        username: null
+      redis_database: 0
+      redis_host: null
+      redis_password: null
+      redis_port: 6379
+      redis_server_name: null
+      redis_ssl: false
+      redis_ssl_verify: false
+      redis_timeout: 2000
+      redis_username: null
+      second: null
+      sync_rate: -1
+      year: null
+    enabled: true
+    name: rate-limiting
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - koodo_service_consumer_dev
+  tags:
+  - koodo_service_consumer_dev
+  username: Jhon
+- acls:
+  - group: gold-subscription
+    tags:
+    - koodo_service_consumers
+  keyauth_credentials:
+  - key: Y2r9bH9A4C1gc8dZJ3LHDf6ESPESQRoA
+    tags:
+    - koodo_service_consumers
+  plugins:
+  - config:
+      day: 100
+      error_code: 429
+      error_message: API rate limit exceeded
+      fault_tolerant: true
+      header_name: null
+      hide_client_headers: false
+      hour: null
+      limit_by: credential
+      minute: null
+      month: null
+      path: null
+      policy: local
+      redis:
+        database: 0
+        host: null
+        password: null
+        port: 6379
+        server_name: null
+        ssl: false
+        ssl_verify: false
+        timeout: 2000
+        username: null
+      redis_database: 0
+      redis_host: null
+      redis_password: null
+      redis_port: 6379
+      redis_server_name: null
+      redis_ssl: false
+      redis_ssl_verify: false
+      redis_timeout: 2000
+      redis_username: null
+      second: null
+      sync_rate: -1
+      year: null
+    enabled: true
+    name: rate-limiting
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - koodo_service_consumer_dev
+  tags:
+  - koodo_service_consumer_dev
+  username: Robert
+- hmacauth_credentials:
+  - secret: test123
+    tags:
+    - example
+    username: test
+  keyauth_credentials:
+  - key: qoxf9Tudy2tL4cm6a2CUQeakgTWjD9X2
+    tags:
+    - koodo_service_consumer
+  tags:
+  - koodo_service_consumer_dev
+  username: TestUser-Dev
+plugins:
+- config:
+    content_type: application/json
+    custom_fields_by_lua:
+      spanid: |
+        local h = kong.request.get_header('traceparent')
+        return h:match("%-[a-f0-9]+%-([a-f0-9]+)%-")
+      traceid: |
+        local h = kong.request.get_header('traceparent')
+        return h:match("%-([a-f0-9]+)%-[a-f0-9]+%-")
+    flush_timeout: null
+    headers: {}
+    http_endpoint: http://fluentbit:8080
+    keepalive: 60000
+    method: POST
+    queue:
+      concurrency_limit: 1
+      initial_retry_delay: 0.01
+      max_batch_size: 1
+      max_bytes: null
+      max_coalescing_delay: 1
+      max_entries: 10000
+      max_retry_delay: 60
+      max_retry_time: 60
+    queue_size: null
+    retry_count: null
+    timeout: 10000
+  enabled: true
+  name: http-log
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  tags:
+  - koodo_service_dev
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: koodo-service-dev.upstream
+  name: koodo-service-dev
+  path: /
+  plugins:
+  - config:
+      allow:
+      - gold-subscription
+      always_use_authenticated_groups: false
+      deny: null
+      hide_groups_header: true
+    enabled: true
+    name: acl
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - koodo_service_dev
+  - config:
+      allow:
+      - 103.207.125.199
+      - 103.70.78.8
+      deny:
+      - 103.207.124.139
+      message: null
+      status: null
+    enabled: true
+    name: ip-restriction
+    protocols:
+    - http
+    - https
+    - tcp
+    - tls
+    - grpc
+    - grpcs
+    tags:
+    - koodo_service_dev
+  - config:
+      anonymous: null
+      hide_credentials: true
+      key_in_body: false
+      key_in_header: true
+      key_in_query: true
+      key_names:
+      - apikey
+      realm: null
+      run_on_preflight: true
+    enabled: true
+    name: key-auth
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - koodo_service_dev
+  - config:
+      ai_metrics: false
+      bandwidth_metrics: true
+      latency_metrics: true
+      per_consumer: true
+      status_code_metrics: true
+      upstream_health_metrics: true
+    enabled: true
+    name: prometheus
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - koodo_service_dev
+  port: 443
+  protocol: https
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    methods:
+    - POST
+    name: koodo-service-dev_dev-v1-koodo-document_document
+    path_handling: v0
+    paths:
+    - ~/dev/v1/koodo/document$
+    plugins:
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /v1/koodo/document
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      tags:
+      - koodo_service_dev
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 200
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - koodo_service_dev
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: koodo-service-dev_dev-v1-koodo-ping_ping
+    path_handling: v0
+    paths:
+    - ~/dev/v1/koodo/ping$
+    plugins:
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /v1/koodo/ping
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      tags:
+      - koodo_service_dev
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 200
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - koodo_service_dev
+  tags:
+  - koodo_service_dev
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: koodo-service-prod.upstream
+  name: koodo-service-prod
+  path: /
+  plugins:
+  - config:
+      custom_fields_by_lua: null
+      path: /dev/stdout
+      reopen: false
+    enabled: false
+    name: file-log
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - koodo_service_prod
+  - config:
+      allow: null
+      deny:
+      - 103.207.124.222
+      message: null
+      status: null
+    enabled: true
+    name: ip-restriction
+    protocols:
+    - http
+    - https
+    - tcp
+    - tls
+    - grpc
+    - grpcs
+    tags:
+    - koodo_service_prod
+  - config:
+      anonymous: null
+      hide_credentials: true
+      key_in_body: false
+      key_in_header: true
+      key_in_query: true
+      key_names:
+      - apikey
+      realm: null
+      run_on_preflight: true
+    enabled: true
+    name: key-auth
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - koodo_service_prod
+  - config:
+      ai_metrics: false
+      bandwidth_metrics: true
+      latency_metrics: true
+      per_consumer: true
+      status_code_metrics: true
+      upstream_health_metrics: true
+    enabled: true
+    name: prometheus
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - koodo_service_prod
+  - config:
+      day: null
+      error_code: 429
+      error_message: API rate limit exceeded
+      fault_tolerant: true
+      header_name: null
+      hide_client_headers: false
+      hour: null
+      limit_by: consumer
+      minute: 5
+      month: null
+      path: null
+      policy: local
+      redis:
+        database: 0
+        host: null
+        password: null
+        port: 6379
+        server_name: null
+        ssl: false
+        ssl_verify: false
+        timeout: 2000
+        username: null
+      redis_database: 0
+      redis_host: null
+      redis_password: null
+      redis_port: 6379
+      redis_server_name: null
+      redis_ssl: false
+      redis_ssl_verify: false
+      redis_timeout: 2000
+      redis_username: null
+      second: null
+      sync_rate: -1
+      year: null
+    enabled: true
+    name: rate-limiting
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - koodo_service_prod
+  port: 443
+  protocol: https
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    methods:
+    - POST
+    name: koodo-service-prod_prod-v1-koodo-document_document
+    path_handling: v0
+    paths:
+    - ~/prod/v1/koodo/document$
+    plugins:
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /v1/koodo/document
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      tags:
+      - koodo_service_prod
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 200
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - koodo_service_prod
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: koodo-service-prod_prod-v1-koodo-ping_ping
+    path_handling: v0
+    paths:
+    - ~/prod/v1/koodo/ping$
+    plugins:
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /v1/koodo/ping
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      tags:
+      - koodo_service_prod
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 200
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - koodo_service_prod
+  tags:
+  - koodo_service_prod
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: koodo-service-stage.upstream
+  name: koodo-service-stage
+  path: /
+  plugins:
+  - config:
+      custom_fields_by_lua: null
+      path: /dev/stdout
+      reopen: false
+    enabled: false
+    name: file-log
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - koodo_service_stage
+  - config:
+      allow: null
+      deny:
+      - 103.207.124.222
+      message: null
+      status: null
+    enabled: true
+    name: ip-restriction
+    protocols:
+    - http
+    - https
+    - tcp
+    - tls
+    - grpc
+    - grpcs
+    tags:
+    - koodo_service_stage
+  - config:
+      anonymous: null
+      hide_credentials: true
+      key_in_body: false
+      key_in_header: true
+      key_in_query: true
+      key_names:
+      - apikey
+      realm: null
+      run_on_preflight: true
+    enabled: true
+    name: key-auth
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - koodo_service_stage
+  - config:
+      ai_metrics: false
+      bandwidth_metrics: true
+      latency_metrics: true
+      per_consumer: true
+      status_code_metrics: true
+      upstream_health_metrics: true
+    enabled: true
+    name: prometheus
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - koodo_service_stage
+  - config:
+      day: null
+      error_code: 429
+      error_message: API rate limit exceeded
+      fault_tolerant: true
+      header_name: null
+      hide_client_headers: false
+      hour: null
+      limit_by: consumer
+      minute: 5
+      month: null
+      path: null
+      policy: local
+      redis:
+        database: 0
+        host: null
+        password: null
+        port: 6379
+        server_name: null
+        ssl: false
+        ssl_verify: false
+        timeout: 2000
+        username: null
+      redis_database: 0
+      redis_host: null
+      redis_password: null
+      redis_port: 6379
+      redis_server_name: null
+      redis_ssl: false
+      redis_ssl_verify: false
+      redis_timeout: 2000
+      redis_username: null
+      second: null
+      sync_rate: -1
+      year: null
+    enabled: true
+    name: rate-limiting
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - koodo_service_stage
+  port: 443
+  protocol: https
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    methods:
+    - POST
+    name: koodo-service-stage_stage-v1-koodo-document_document
+    path_handling: v0
+    paths:
+    - ~/stage/v1/koodo/document$
+    plugins:
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /v1/koodo/document
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      tags:
+      - koodo_service_stage
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 200
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - koodo_service_stage
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: koodo-service-stage_stage-v1-koodo-ping_ping
+    path_handling: v0
+    paths:
+    - ~/stage/v1/koodo/ping$
+    plugins:
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /v1/koodo/ping
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      tags:
+      - koodo_service_stage
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 200
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - koodo_service_stage
+  tags:
+  - koodo_service_stage
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: httpbin.org
+  name: test-service
+  path: /anything
+  plugins:
+  - config:
+      algorithms:
+      - hmac-sha1
+      - hmac-sha256
+      - hmac-sha384
+      - hmac-sha512
+      anonymous: null
+      clock_skew: 300
+      enforce_headers: []
+      hide_credentials: false
+      realm: null
+      validate_request_body: false
+    enabled: true
+    name: hmac-auth
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - example
+  port: 443
+  protocol: https
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    name: test-route
+    path_handling: v0
+    paths:
+    - /test
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+    tags:
+    - example
+  tags:
+  - example
+  write_timeout: 60000
+upstreams:
+- algorithm: consistent-hashing
+  hash_fallback: none
+  hash_on: ip
+  hash_on_cookie_path: /
+  healthchecks:
+    active:
+      concurrency: 10
+      healthy:
+        http_statuses:
+        - 200
+        - 302
+        interval: 0
+        successes: 0
+      http_path: /
+      https_verify_certificate: true
+      timeout: 1
+      type: http
+      unhealthy:
+        http_failures: 0
+        http_statuses:
+        - 429
+        - 404
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 505
+        interval: 0
+        tcp_failures: 0
+        timeouts: 0
+    passive:
+      healthy:
+        http_statuses:
+        - 200
+        - 201
+        - 202
+        - 203
+        - 204
+        - 205
+        - 206
+        - 207
+        - 208
+        - 226
+        - 300
+        - 301
+        - 302
+        - 303
+        - 304
+        - 305
+        - 306
+        - 307
+        - 308
+        successes: 0
+      type: http
+      unhealthy:
+        http_failures: 3
+        http_statuses:
+        - 429
+        - 500
+        - 503
+        tcp_failures: 3
+        timeouts: 3
+    threshold: 0
+  name: koodo-service-dev.upstream
+  slots: 10000
+  tags:
+  - koodo_service_dev
+  targets:
+  - tags:
+    - koodo_service_dev
+    target: koodo-product-dev-480868035316.us-central1.run.app:443
+    weight: 100
+  use_srv_name: false
+- algorithm: consistent-hashing
+  hash_fallback: none
+  hash_on: ip
+  hash_on_cookie_path: /
+  healthchecks:
+    active:
+      concurrency: 10
+      healthy:
+        http_statuses:
+        - 200
+        - 302
+        interval: 0
+        successes: 0
+      http_path: /
+      https_verify_certificate: true
+      timeout: 1
+      type: http
+      unhealthy:
+        http_failures: 0
+        http_statuses:
+        - 429
+        - 404
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 505
+        interval: 0
+        tcp_failures: 0
+        timeouts: 0
+    passive:
+      healthy:
+        http_statuses:
+        - 200
+        - 201
+        - 202
+        - 203
+        - 204
+        - 205
+        - 206
+        - 207
+        - 208
+        - 226
+        - 300
+        - 301
+        - 302
+        - 303
+        - 304
+        - 305
+        - 306
+        - 307
+        - 308
+        successes: 0
+      type: http
+      unhealthy:
+        http_failures: 3
+        http_statuses:
+        - 429
+        - 500
+        - 503
+        tcp_failures: 3
+        timeouts: 3
+    threshold: 0
+  name: koodo-service-prod.upstream
+  slots: 10000
+  tags:
+  - koodo_service_prod
+  targets:
+  - tags:
+    - koodo_service_prod
+    target: koodo-product-prod-480868035316.us-central1.run.app:443
+    weight: 100
+  use_srv_name: false
+- algorithm: consistent-hashing
+  hash_fallback: none
+  hash_on: ip
+  hash_on_cookie_path: /
+  healthchecks:
+    active:
+      concurrency: 10
+      healthy:
+        http_statuses:
+        - 200
+        - 302
+        interval: 0
+        successes: 0
+      http_path: /
+      https_verify_certificate: true
+      timeout: 1
+      type: http
+      unhealthy:
+        http_failures: 0
+        http_statuses:
+        - 429
+        - 404
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 505
+        interval: 0
+        tcp_failures: 0
+        timeouts: 0
+    passive:
+      healthy:
+        http_statuses:
+        - 200
+        - 201
+        - 202
+        - 203
+        - 204
+        - 205
+        - 206
+        - 207
+        - 208
+        - 226
+        - 300
+        - 301
+        - 302
+        - 303
+        - 304
+        - 305
+        - 306
+        - 307
+        - 308
+        successes: 0
+      type: http
+      unhealthy:
+        http_failures: 3
+        http_statuses:
+        - 429
+        - 500
+        - 503
+        tcp_failures: 3
+        timeouts: 3
+    threshold: 0
+  name: koodo-service-stage.upstream
+  slots: 10000
+  tags:
+  - koodo_service_stage
+  targets:
+  - tags:
+    - koodo_service_stage
+    target: koodo-product-staging-480868035316.us-central1.run.app:443
+    weight: 100
+  use_srv_name: false
